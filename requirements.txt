@@ -16,6 +16,7 @@ Flask==2.3.0
 numpy==1.23.0
 matplotlib==3.5.2
 tensorflow==2.9.1
+Spotify
 
 face-detection-adas-0001
 common-sign-language-0002
