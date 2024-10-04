@@ -37,7 +37,7 @@ This project aims to monitor and analyze driver behavior in real time using comp
 ## USAGE
 1. Run the Driver Detection System You can start the driver behavior detection system by running:
    ```bash
-   python driver_detection.py
+   prg1.py
 2. ### Real-time Alerts
    The system will analyze the driver’s actions and display alerts if any dangerous or distracted behavior is detected.
 3. ### Scoring System
