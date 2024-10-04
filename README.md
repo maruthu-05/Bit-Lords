@@ -1,12 +1,13 @@
 # Driver Behavior Analysis
 
-This project aims to monitor and analyze driver behavior in real time using computer vision and machine learning techniques. The system focuses on detecting distractions, such as mobile usage (watching or speaking) and other activities unrelated to driving. It uses pre-trained models from the Intel OpenVINO Model Zoo and is integrated with oneAPI for high performance.
+This project aims to monitor and analyze driver behavior in real time using computer vision and machine learning techniques. The system focuses on detecting distractions, such as drowsiness and other activities unrelated to driving. It uses pre-trained models from the Intel OpenVINO Model Zoo and is integrated with oneAPI for high performance.
 
 ## Key Features:
 
 - Real-time face and eye detection using a camera focused on the driver.
-- Detection of mobile phone usage (both watching and speaking).
+- Partially interactive AI that act as the partner for driver in drowsiness.
 - Scoring system that evaluates driver behavior and provides alerts based on specific distractions.
+- SOS alert system using a simple gesture.
 
 ## Prerequisites
 
@@ -17,6 +18,7 @@ This project aims to monitor and analyze driver behavior in real time using comp
 - Python 3.8+: Core language for the project.
 
 ## Setup
+
 1. Clone the Repository
 
    ```bash
@@ -95,7 +97,7 @@ This page allows an admin to log in to manage driver data and behavior reports.
 ### 5. Live Detecting Image Page
 This page shows the live detecting of driver behavior while the monitoring system is running.
 
-![WhatsApp Image 2024-10-05 at 02 41 00_67aa15a1](https://github.com/user-attachments/assets/5d5336ce-f1ba-42c1-a6c2-c50f6697d3b8)
+![WhatsApp Image 2024-10-05 at 04 32 17_92bb1f23](https://github.com/user-attachments/assets/b21cc0d2-9c01-4da2-acf6-af6393dab581)
 
 - **Function**: Displays real-time visual feedback of the driver behavior detection system.
 - **Description**: Shows live analysis of driver behavior, highlighting distractions such as phone usage.
@@ -103,8 +105,8 @@ This page shows the live detecting of driver behavior while the monitoring syste
 
 
 ## Future Enhancements
--Integration of more behavior detection models (e.g., drowsiness, seatbelt detection).
--Real-time alerts and notifications to the driver based on detected behaviors.
+- Integration of more behavior detection models (e.g., emotion detection, seatbelt detection).
+- Real-time alerts and notifications to the driver based on detected behaviors.
 
 ## License
 This project is licensed under the MIT License - see the LICENSE.md file for details.
