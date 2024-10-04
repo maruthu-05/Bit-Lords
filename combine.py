@@ -48,7 +48,7 @@ def speak_alert(alert_message):
 
 # Thresholds for eye and yawn detection
 EYE_AR_THRESH = 0.22
-MOUTH_AR_THRESH = 0.7865  # Threshold for yawning
+MOUTH_AR_THRESH = 0.75  # Adjusted threshold for yawning
 EYE_CLOSED_TIME_THRESH = 3  # Time threshold for alert in seconds
 YAWN_TIME_THRESH = 2.5  # Yawn must last at least 3 seconds to be counted
 
@@ -80,6 +80,10 @@ score_update_interval = 1200  # Update score every 20 minutes
 eye_alert_spoken = False
 yawn_alert_spoken = False
 yawn_in_progress = False  # Track if a yawn is currently in progress
+
+# Buffers for smoothing MAR
+mar_buffer = []
+buffer_size = 10  # Size of buffer to smooth MAR
 
 while True:
     ret, frame = vs.read()
@@ -128,6 +132,12 @@ while True:
 
             mar = mouth_aspect_ratio(mouth)
 
+            # Smooth MAR
+            mar_buffer.append(mar)
+            if len(mar_buffer) > buffer_size:
+                mar_buffer.pop(0)
+            smooth_mar = sum(mar_buffer) / len(mar_buffer)
+
             # Visualize eyes and mouth
             leftEyeHull = cv2.convexHull(leftEye)
             rightEyeHull = cv2.convexHull(rightEye)
@@ -150,14 +160,14 @@ while True:
                 eye_alert_spoken = False
 
             # Check for yawning
-            if mar > MOUTH_AR_THRESH:
+            if smooth_mar > MOUTH_AR_THRESH:
                 if not yawn_in_progress:
                     yawn_in_progress = True
                     yawn_start_time = time.time()
 
+                # Check if yawn has been ongoing long enough
                 if yawn_in_progress and (time.time() - yawn_start_time > YAWN_TIME_THRESH):
-                    cv2.putText(frame, "YAWNING", (10, 50),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                    cv2.putText(frame, "YAWNING", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
                     if not yawn_alert_spoken:
                         alert_message = "Alert! You are yawning."
                         speak_alert(alert_message)
