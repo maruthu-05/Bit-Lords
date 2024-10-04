@@ -57,7 +57,15 @@ This project aims to monitor and analyze driver behavior in real time using comp
 
 ## Project Structure
 
-### 1. Driver Login Page
+### 1. Live Detecting Image Page
+This page shows the live detecting of driver behavior while the monitoring system is running.
+
+![WhatsApp Image 2024-10-05 at 04 32 17_92bb1f23](https://github.com/user-attachments/assets/b21cc0d2-9c01-4da2-acf6-af6393dab581)
+
+- **Function**: Displays real-time visual feedback of the driver behavior detection system.
+- **Description**: Shows live analysis of driver behavior, highlighting distractions such as phone usage.
+
+### 2. Driver Login Page
 This is the initial login page where the driver inputs their email to start the monitoring process.
 
 ![Driver Login](https://github.com/user-attachments/assets/e8289ff6-fe94-4096-9d37-befdaeb88c09)
@@ -67,7 +75,7 @@ This is the initial login page where the driver inputs their email to start the 
 - **Function**: Allows the driver to start or stop the monitoring session.
 - **Description**: A simple interface for driver login with options to start or stop behavior monitoring.
 
-### 2. Registration Page
+### 3. Registration Page
 This page is used to create a new driver account, with fields for basic details such as name, email, password, and driving experience.
 
 ![Driver Registration](https://github.com/user-attachments/assets/ba2abaaa-02eb-42b7-ba21-b4c323e74d0c)
@@ -76,7 +84,7 @@ This page is used to create a new driver account, with fields for basic details 
 - **Function**: Registers new users into the system by capturing details like username, email, password, and driving experience.
 - **Description**: The driver provides personal information needed for the scoring and monitoring process.
 
-### 3. Driver Profile Page
+### 4. Driver Profile Page
 This page displays the driver’s details, including their current score and experience.
 
 ![Driver Profile](https://github.com/user-attachments/assets/49105bc1-296e-4724-b3ba-c098c1d06b0f)
@@ -85,7 +93,7 @@ This page displays the driver’s details, including their current score and exp
 - **Function**: Displays driver details and the behavior analysis score based on detected distractions.
 - **Description**: A summary of driver performance and data fetched from the Firebase database.
 
-### 4. Admin Login Page
+### 5. Admin Login Page
 This page allows an admin to log in to manage driver data and behavior reports.
 
 ![Admin Login](https://github.com/user-attachments/assets/f3c4d631-ed69-4b2e-8118-ccc4b17c615a)
@@ -93,16 +101,6 @@ This page allows an admin to log in to manage driver data and behavior reports.
 
 - **Function**: Grants the admin access to view and manage driver data, including scores and performance.
 - **Description**: Admin can access and review the performance of drivers and system activity.
-
-### 5. Live Detecting Image Page
-This page shows the live detecting of driver behavior while the monitoring system is running.
-
-![WhatsApp Image 2024-10-05 at 04 32 17_92bb1f23](https://github.com/user-attachments/assets/b21cc0d2-9c01-4da2-acf6-af6393dab581)
-
-- **Function**: Displays real-time visual feedback of the driver behavior detection system.
-- **Description**: Shows live analysis of driver behavior, highlighting distractions such as phone usage.
-
-
 
 ## Future Enhancements
 - Integration of more behavior detection models (e.g., emotion detection, seatbelt detection).
