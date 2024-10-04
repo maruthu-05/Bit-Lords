@@ -1,7 +1,50 @@
 # Driver Behavior Analysis
 
-This project focuses on detecting driver distractions and behaviors using a camera to monitor the driver’s face. The system can detect activities such as mobile phone usage (watching, speaking) and other non-driving behaviors. The output is used to score the driver’s performance and alert them in real-time if necessary.
+This project aims to monitor and analyze driver behavior in real time using computer vision and machine learning techniques. The system focuses on detecting distractions, such as mobile usage (watching or speaking) and other activities unrelated to driving. It uses pre-trained models from the Intel OpenVINO Model Zoo and is integrated with oneAPI for high performance.
 
+## Key Features:
+
+- Real-time face and eye detection using a camera focused on the driver.
+- Detection of mobile phone usage (both watching and speaking).
+- Scoring system that evaluates driver behavior and provides alerts based on specific distractions.
+
+## Prerequisites
+
+- OpenVINO Toolkit: Pre-trained models from Intel's OpenVINO Model Zoo.
+- oneAPI Toolkit: For hardware acceleration.
+- Firebase: Used for data storage and management.
+- HTML: Frontend interface to capture and store inputs into Firebase.
+- Python 3.8+: Core language for the project.
+
+## Setup
+1. Clone the Repository
+
+   ```bash
+   git clone https://github.com/your-username/driver-behavior-detection.git
+   cd driver-behavior-detection
+2. Install Dependencies Make sure you have the required packages installed. You can install the dependencies using the following command:
+
+   ```bash
+   pip install -r requirements.txt
+3. Install OpenVINO Follow the instructions from Intel's official OpenVINO documentation to install OpenVINO and configure the environment.
+4. ### Set up Firebase
+- Create a Firebase project and configure your Firestore database.
+- Use the Firebase SDK to connect your project to Firebase. You will need the firebaseConfig object from the Firebase console.
+5. Configure the Camera Ensure the system has access to a camera that can capture the driver's face. This will be used to detect driver behavior.
+
+## USAGE
+1. Run the Driver Detection System You can start the driver behavior detection system by running:
+   ```bash
+   python driver_detection.py
+2. ### Real-time Alerts
+   The system will analyze the driver’s actions and display alerts if any dangerous or distracted behavior is detected.
+3. ### Scoring System
+   The scoring system evaluates the driver’s behavior based on detected distractions. The score can be used to generate a report or trigger alerts through a responsible AI voice assistant integrated with the system.
+
+## Integration with Firebase
+- Data from each detection (distractions and score) is stored in Firebase for further analysis.
+- HTML forms capture additional data and store it in the Firestore database, enabling a seamless interaction between the web interface and the backend detection system.
+  
 ## Features
 
 - Driver registration and login system
@@ -57,29 +100,7 @@ This page shows the live detecting of driver behavior while the monitoring syste
 - **Function**: Displays real-time visual feedback of the driver behavior detection system.
 - **Description**: Shows live analysis of driver behavior, highlighting distractions such as phone usage.
 
-## How to Run the Project
 
-1. Clone the repository:
-
-   ```bash
-   git clone <repository-url>
-2. Install required dependencies:
-
-   ```bash
-   pip install -r requirements.txt
-3. Configure Firebase credentials in the project for database integration.
-4. Run the driver behavior analysis model with:
-   ```bash
-   python driver_monitor.py
-5. Open the web interface and log in as a driver or admin to start the session.
-## Firebase Integration
-The driver data (e.g., name, score, and behavior analysis) is stored in Firebase. You will need to configure Firebase by adding your Firebase project credentials.
-
-## Technologies Used
--OpenVINO Toolkit: For running pre-trained models for driver monitoring.
--Firebase: As the database to store driver records.
--HTML/CSS/JavaScript: For front-end web development.
--Python: For the backend logic and behavior analysis model.
 
 ## Future Enhancements
 -Integration of more behavior detection models (e.g., drowsiness, seatbelt detection).
