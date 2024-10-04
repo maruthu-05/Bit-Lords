@@ -1,0 +1,24 @@
+import firebase_admin
+from firebase_admin import credentials, db
+import cv2
+import dlib
+from imutils import face_utils
+import numpy as np
+from scipy.spatial import distance as dist
+import time
+import pyttsx3  # Importing TTS library
+from openvino.runtime import Core 
+
+openvino==2024.0
+opencv-python==4.5.5
+firebase-admin==5.0.2
+Flask==2.3.0
+numpy==1.23.0
+matplotlib==3.5.2
+tensorflow==2.9.1
+
+face-detection-adas-0001
+common-sign-language-0002
+asl-recognition-0004
+person-detection-asl-0001
+shape_predictor_68_face_landmarks
