@@ -57,3 +57,32 @@ This page shows the live detecting of driver behavior while the monitoring syste
 - **Function**: Displays real-time visual feedback of the driver behavior detection system.
 - **Description**: Shows live analysis of driver behavior, highlighting distractions such as phone usage.
 
+## How to Run the Project
+
+1. Clone the repository:
+
+   ```bash
+   git clone <repository-url>
+2. Install required dependencies:
+
+   ```bash
+   pip install -r requirements.txt
+3.Configure Firebase credentials in the project for database integration.
+4.Run the driver behavior analysis model with:
+   python driver_monitor.py
+5.Open the web interface and log in as a driver or admin to start the session.
+##Firebase Integration
+The driver data (e.g., name, score, and behavior analysis) is stored in Firebase. You will need to configure Firebase by adding your Firebase project credentials.
+
+##Technologies Used
+-OpenVINO Toolkit: For running pre-trained models for driver monitoring.
+-Firebase: As the database to store driver records.
+-HTML/CSS/JavaScript: For front-end web development.
+-Python: For the backend logic and behavior analysis model.
+
+##Future Enhancements
+-Integration of more behavior detection models (e.g., drowsiness, seatbelt detection).
+-Real-time alerts and notifications to the driver based on detected behaviors.
+
+##License
+This project is licensed under the MIT License - see the LICENSE.md file for details.
