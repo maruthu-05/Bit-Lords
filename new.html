@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile Page</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-storage.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Left side: Fetch data by email -->
+        <div class="fetch-container">
+            <h1>Fetch Driver Data by Email</h1>
+            <input type="email" id="fetchEmail" placeholder="Enter Driver Email" required>
+            <button id="fetchButton">Fetch Data</button>
+            <p><a href="register.html">Back to Registration</a></p>
+        </div>
+
+        <!-- Right side: Profile container -->
+        <div class="profile-container" id="userData" style="display: none;">
+            <div class="profile-left">
+                <h2 class="username">AK62__kadavul</h2>
+                <p class="name">Asith Kumar</p>
+                <p class="location">Chennai, India</p>
+                <p class="institution"> UBER</p>
+
+                <div class="rating-section">
+                    <p class="rating-label">Driver rating</p>
+                    <p class="rating-value"><span class="rating">1000</span></p>
+                </div>
+
+                <div class="settings-section">
+                    <p>Driver experience: 5 years</p>
+                </div>
+
+                <div class="email-section">
+                    <p>ajitheykadavul@gmail.com</p>
+                </div>
+
+                <div class="last-Drive">
+                    <p>Adress: <span class="Driving">currently driving</span></p>
+                </div>
+
+                <div class="registration-section">
+                    <p>Address: 4 months ago</p>
+                </div>
+            </div>
+
+            <!-- Profile photo at the center-right -->
+            <div class="profile-right">
+                <div class="profile-picture">
+                    <img src="driv.jpg" alt="Profile Picture">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyDzll5isKjWnT9J4KcOy0rknz9Blr9_EAM",
+            authDomain: "dms-hackthon.firebaseapp.com",
+            databaseURL: "https://dms-hackthon-default-rtdb.firebaseio.com",
+            projectId: "dms-hackthon",
+            storageBucket: "dms-hackthon.appspot.com",
+            messagingSenderId: "334443472890",
+            appId: "1:334443472890:web:13cb601358267324b06643",
+            measurementId: "G-7BYNSGS0Z2"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+        const registerformDB = database.ref("registerform");
+
+        document.getElementById("fetchButton").addEventListener("click", fetchUserData);
+
+        function fetchUserData() {
+            const email = document.getElementById('fetchEmail').value.trim();
+            const dbRef = registerformDB.orderByChild('Email').equalTo(email);
+
+            dbRef.once('value', (snapshot) => {
+                const userData = snapshot.val();
+                const userDiv = document.getElementById('userData');
+                userDiv.innerHTML = ''; // Clear previous data
+
+                if (userData) {
+                    Object.keys(userData).forEach(key => {
+                        const user = userData[key];
+                        userDiv.innerHTML += `
+                            <h2 class="username">${user.Username}</h2>
+                            <div class="name">
+                                <p>Age: ${user.Age}</p>
+                            </div>
+                            <p class="location">${user.Native  }</p>
+                            <p class="institution">${user.Phone }</p>
+
+                            <div class="rating-section">
+                                <p class="rating-label">Driver rating</p>
+                                <p class="rating-value"><span class="rating">${user.rating || 'N/A'}</span></p>
+                            </div>
+
+                            <div class="settings-section">
+                                <p>Driver experience: ${user.Experience || 'N/A'}</p>
+                            </div>
+
+                            <div class="email-section">
+                                <p>${user.Email}</p>
+                            </div>
+
+                            <div class="last-Drive">
+                                <p>Adress: <span class="Driving">${user.Address || 'N/A'}</span></p>
+                            </div>
+
+                            <div class="registration-section">
+                                <p>Registered: ${user.Registered || 'N/A'}</p>
+                            </div>
+                            <div class="profile-right">
+                                <div class="profile-picture">
+                                    <img src="driv.jpg" alt="Profile Picture">
+    </div>
+                            
+                        `;
+                    });
+
+                    userDiv.style.display = 'flex'; // Show profile container
+                } else {
+                    userDiv.style.display = 'none'; // Hide profile container if no data
+                }
+            });
+        }
+    </script>
+</body>
+</html>

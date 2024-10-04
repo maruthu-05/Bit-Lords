@@ -1,0 +1,65 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0;
+    background-image: url('driver3.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.login-container, .register-container {
+    background-color: rgba(0, 0, 0, 0.1); 
+    padding: 20px;
+    border-radius: 12px;
+    width: 400px; /* Adjusted width for a cleaner look */
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: white;
+}
+
+.input-group {
+    margin-bottom: 15px; /* Adjusted to keep it vertical */
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: white;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 2px solid white;
+    border-radius: 12px;
+    color: white;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: hsl(0, 66%, 61%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+p {
+    text-align: center;
+    margin-top: 10px;
+}

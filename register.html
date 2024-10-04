@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="style11.css">
+</head>
+<body>
+    <div class="register-container" style="color: white;">
+        <form action="" id="registerform">
+            <h2 style="color: white;">Register</h2>
+
+            <!-- Row 1: Username, Email, Password -->
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="username" style="color: white;">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="input-group">
+                    <label for="email" style="color: white;">Email:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="input-group">
+                    <label for="password" style="color: white;">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+            </div>
+
+            <!-- Row 2: Confirm Password, Experience, Age -->
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="confirmpassword" style="color: white;">Confirm Password:</label>
+                    <input type="password" id="confirmpassword" name="confirmpassword" required>
+                </div>
+                <div class="input-group">
+                    <label for="experience" style="color: white;">Experience (years):</label>
+                    <input type="number" id="experience" name="experience" min="0" required>
+                </div>
+                <div class="input-group">
+                    <label for="age" style="color: white;">Age:</label>
+                    <input type="number" id="age" name="age" min="1" required>
+                </div>
+            </div>
+
+            <!-- Row 3: Native Place, Phone Number, Address -->
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="native" style="color: white;">Native Place:</label>
+                    <input type="text" id="native" name="native" required>
+                </div>
+                <div class="input-group">
+                    <label for="phone" style="color: white;">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone" pattern="[0-9]{10}" required>
+                </div>
+                <div class="input-group">
+                    <label for="address" style="color: white;">Address:</label>
+                    <textarea id="address" name="address" rows="3" required></textarea>
+                </div>
+            </div>
+
+            <button type="submit">Register</button>
+        </form>
+
+        <div class="alert" style="display: none; color: red;">Form submitted successfully!</div>
+
+        <p style="color: white;">Already have an account? 
+            <a href="C:\Users\narai\OneDrive\Desktop\cour\login.html" style="color: white;">Login here</a>
+        </p>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/7.14.1/firebase-storage.js"></script>
+    <script src="./config.js"></script>
+</body>
+</html>
