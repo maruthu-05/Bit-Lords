@@ -22,8 +22,8 @@ This project aims to monitor and analyze driver behavior in real time using comp
 1. Clone the Repository
 
    ```bash
-   git clone https://github.com/your-username/driver-behavior-detection.git
-   cd driver-behavior-detection
+   git clone https://github.com/Narain3108/Bit-Lords.git
+   cd Bit-Lords
 2. Install Dependencies Make sure you have the required packages installed. You can install the dependencies using the following command:
 
    ```bash
