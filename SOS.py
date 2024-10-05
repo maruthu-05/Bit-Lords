@@ -1,121 +1,73 @@
 import cv2
-import numpy as np
+import mediapipe as mp
+import requests
 from openvino.runtime import Core
 
-# Load the OpenVINO model
-ie = Core()
+mp_hands = mp.solutions.hands
+hands = mp_hands.Hands(min_detection_confidence=0.8, min_tracking_confidence=0.8)
 
-# Model paths
-model_paths = {
-    "person_detection": r"C:\Downloads\Models\intel\person-detection-asl-0001\FP32\person-detection-asl-0001.xml",
-    "asl_recognition": r"C:\Downloads\Models\intel\asl-recognition-0004\FP32\asl-recognition-0004.xml",
-    "sign_language": r"C:\Downloads\Models\intel\common-sign-language-0002\FP32\common-sign-language-0002.xml"
-}
+def is_clenched_fist(landmarks):
+    thumb_tip = landmarks[mp_hands.HandLandmark.THUMB_TIP]
+    index_tip = landmarks[mp_hands.HandLandmark.INDEX_FINGER_TIP]
+    middle_tip = landmarks[mp_hands.HandLandmark.MIDDLE_FINGER_TIP]
+    ring_tip = landmarks[mp_hands.HandLandmark.RING_FINGER_TIP]
+    pinky_tip = landmarks[mp_hands.HandLandmark.PINKY_TIP]
 
-weights_paths = {
-    "person_detection": r"C:\Downloads\Models\intel\person-detection-asl-0001\FP32\person-detection-asl-0001.bin",
-    "asl_recognition": r"C:\Downloads\Models\intel\asl-recognition-0004\FP32\asl-recognition-0004.bin",
-    "sign_language": r"C:\Downloads\Models\intel\common-sign-language-0002\FP32\common-sign-language-0002.bin"
-}
+    index_distance = ((thumb_tip.x - index_tip.x) ** 2 + (thumb_tip.y - index_tip.y) ** 2) ** 0.5
+    middle_distance = ((thumb_tip.x - middle_tip.x) ** 2 + (thumb_tip.y - middle_tip.y) ** 2) ** 0.5
+    ring_distance = ((thumb_tip.x - ring_tip.x) ** 2 + (thumb_tip.y - ring_tip.y) ** 2) ** 0.5
+    pinky_distance = ((thumb_tip.x - pinky_tip.x) ** 2 + (thumb_tip.y - pinky_tip.y) ** 2) ** 0.5
 
-# Load and compile the models
-exec_nets = {name: ie.read_model(model=model_path, weights=weights_paths[name]) for name, model_path in model_paths.items()}
-exec_nets = {name: ie.compile_model(model=exec_net, device_name="CPU") for name, exec_net in exec_nets.items()}
+    if index_distance < 0.1 and middle_distance < 0.1 and ring_distance < 0.1 and pinky_distance < 0.1:
+        return True
+    return False
 
-# Load webcam for capturing video
-cap = cv2.VideoCapture(0)
+def is_peace_sign(landmarks):
+    thumb_tip = landmarks[mp_hands.HandLandmark.THUMB_TIP].y
+    index_tip = landmarks[mp_hands.HandLandmark.INDEX_FINGER_TIP].y
+    middle_tip = landmarks[mp_hands.HandLandmark.MIDDLE_FINGER_TIP].y
+    ring_tip = landmarks[mp_hands.HandLandmark.RING_FINGER_TIP].y
+    pinky_tip = landmarks[mp_hands.HandLandmark.PINKY_TIP].y
 
-# Buffer for storing frames for temporal input
-frame_buffer = []
-max_frames = 8  # Assuming the model requires 8 frames
+    return (index_tip < middle_tip < thumb_tip and 
+            ring_tip > middle_tip and 
+            pinky_tip > middle_tip and 
+            abs(thumb_tip - ring_tip) > 0.05 and 
+            abs(thumb_tip - pinky_tip) > 0.05)
 
-# Gesture detection function
-def detect_gesture(gesture_ids):
-    """
-    Detect specific gestures based on gesture IDs.
-    Here we check for the signs of Help, Ambulance, and Police.
-    """
-    if len(gesture_ids) == 0:
-        return None
+cap = cv2.VideoCapture(1)
 
-    # Debug: Print the gesture IDs detected by the model
-    print(f"Detected gesture IDs: {gesture_ids}")
-
-    # Check for specific gesture IDs (Assuming these gesture IDs are the correct ones)
-    if 1 in gesture_ids and 2 in gesture_ids:  # Thumb and Index raised
-        return "HELP"
-    elif 1 in gesture_ids and 5 in gesture_ids:  # Thumb and Pinky raised
-        return "AMBULANCE"
-    elif 1 in gesture_ids:  # Only Thumb raised
-        return "POLICE"
-    
-    return None
-
-# Flag for the last detected gesture
-last_detected_gesture = None
-
-# Main loop for gesture detection
 while cap.isOpened():
-    ret, frame = cap.read()
-    if not ret:
+    success, image = cap.read()
+    if not success:
         break
 
-    # Prepare input for person detection
-    input_image_pd = cv2.resize(frame, (320, 320))  # Resize to 320x320 as expected by the person detection model
-    input_image_pd = input_image_pd.transpose((2, 0, 1))  # Change data layout to C,H,W
-    input_image_pd = np.expand_dims(input_image_pd, axis=0)  # Add batch dimension
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)  # Ensure image is in RGB format
+    results = hands.process(image)
 
-    # Get input name and perform person detection
-    input_name_pd = next(iter(exec_nets["person_detection"].inputs))
-    results_pd = exec_nets["person_detection"]({input_name_pd: input_image_pd})
-    output_node_pd = next(iter(exec_nets["person_detection"].outputs))
-    person_detections = results_pd[output_node_pd]
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            if is_clenched_fist(hand_landmarks.landmark):
+                print("Clenched fist detected! Stopping the program...")
+                cap.release()
+                cv2.destroyAllWindows()
+                exit()  # Exit the program
 
-    # Adjust detection logic based on the actual output format
-    person_detected = np.any(person_detections)  # Check if any person is detected
+            elif is_peace_sign(hand_landmarks.landmark):
+                print("Peace sign detected! Stopping the program...")
+                cap.release()
+                cv2.destroyAllWindows()
+                exit()  # Exit the program
 
-    if not person_detected:
-        cv2.imshow('Hand Gesture Detection', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-        continue
+            # Draw landmarks with a specified color (e.g., Red in BGR format)
+            mp.solutions.drawing_utils.draw_landmarks(image, hand_landmarks, 
+                                                       mp_hands.HAND_CONNECTIONS, 
+                                                       mp.solutions.drawing_utils.DrawingSpec(color=(255, 0, 0), thickness=2, circle_radius=2))
 
-    # Prepare input for gesture recognition
-    input_image_gesture = cv2.resize(frame, (224, 224))  # Resize to 224x224 as expected by the gesture recognition model
-    input_image_gesture = input_image_gesture.transpose((2, 0, 1))  # Change data layout to C,H,W
-    input_image_gesture = np.expand_dims(input_image_gesture, axis=0)  # Add batch dimension
+    cv2.imshow("Hand Gesture Detection", cv2.cvtColor(image, cv2.COLOR_RGB2BGR))  # Convert back to BGR for display
 
-    # Append to frame buffer and process only if enough frames are collected
-    frame_buffer.append(input_image_gesture)
-    if len(frame_buffer) > max_frames:
-        frame_buffer.pop(0)
-
-    if len(frame_buffer) == max_frames:
-        # Stack frames to create a 5D tensor (1, 3, 8, 224, 224)
-        input_tensor = np.concatenate(frame_buffer, axis=0)  # Shape: (8, 3, 224, 224)
-        input_tensor = np.expand_dims(input_tensor, axis=0)  # Shape: (1, 8, 3, 224, 224)
-        input_tensor = input_tensor.transpose(0, 2, 1, 3, 4)  # Shape: (1, 3, 8, 224, 224)
-
-        # Perform gesture recognition
-        input_name_gesture = next(iter(exec_nets["sign_language"].inputs))
-        results_gesture = exec_nets["sign_language"]({input_name_gesture: input_tensor})
-        output_node_gesture = next(iter(exec_nets["sign_language"].outputs))
-        gesture_ids = results_gesture[output_node_gesture].astype(int).flatten()  # Assuming model returns gesture IDs
-
-        # Detect gesture
-        detected_gesture = detect_gesture(gesture_ids)
-
-        if detected_gesture and detected_gesture != last_detected_gesture:
-            last_detected_gesture = detected_gesture
-            alert_text = f"Alert: {detected_gesture} Needed!"
-            cv2.putText(frame, alert_text, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
-            print(alert_text)
-
-    # Display the frame
-    cv2.imshow('Hand Gesture Detection', frame)
-    if cv2.waitKey(1) & 0xFF == ord('q'):
+    if cv2.waitKey(1) & 0xFF == ord('q'):  # Press 'q' to quit
         break
 
-# Cleanup
 cap.release()
 cv2.destroyAllWindows()
