@@ -1,4 +1,3 @@
-
 import firebase_admin
 from firebase_admin import credentials, db
 import cv2
@@ -9,6 +8,27 @@ from scipy.spatial import distance as dist
 import time
 import pyttsx3  # Importing TTS library
 from openvino.runtime import Core  # Updated OpenVINO library
+import subprocess
+import speech_recognition as sr
+
+
+def get_voice_command():
+    recognizer = sr.Recognizer()
+    with sr.Microphone() as source:
+        print("Listening for a command...")
+        audio = recognizer.listen(source)
+
+    try:
+        command = recognizer.recognize_google(audio)
+        print(f"You said: {command}")
+        return command.lower()  # Return the command in lowercase for consistency
+    except sr.UnknownValueError:
+        print("Sorry, I did not understand the audio.")
+        return None
+    except sr.RequestError as e:
+        print(f"Could not request results from Google Speech Recognition service; {e}")
+        return None
+# Initialize Firebase app with service account credentials
 
 # Initialize TTS engine
 engine = pyttsx3.init()
@@ -40,18 +60,18 @@ YAWN_TIME_THRESH = 2.5  # Yawn must last at least 3 seconds to be counted
 # Load OpenVINO face detection model (for the box)
 print("-> Loading OpenVINO face detection model...")
 ie = Core()
-model_xml = r"F:\one api packages\intel\face-detection-adas-0001\FP32\face-detection-adas-0001.xml"
+model_xml = r"C:\Windows\System32\intel\face-detection-adas-0001\FP32\face-detection-adas-0001.xml"
 compiled_model = ie.compile_model(model=model_xml, device_name="CPU")
 input_layer = compiled_model.input(0)
 
 # Load dlib's shape predictor for facial landmarks
 print("-> Loading the predictor...")
-shape_predictor_path = r"F:\Drowsiness-and-Yawn-Detection-with-voice-alert-using-Dlib-master\Drowsiness-and-Yawn-Detection-with-voice-alert-using-Dlib-master\shape_predictor_68_face_landmarks.dat"
+shape_predictor_path = r"C:\Users\Mahesh\Downloads\shape_predictor_68_face_landmarks.dat"
 predictor = dlib.shape_predictor(shape_predictor_path)
 
 # Start the video stream
 print("-> Starting the video stream...")
-vs = cv2.VideoCapture(0)
+vs = cv2.VideoCapture(1)
 time.sleep(1.0)
 
 COUNTER = 0
@@ -69,6 +89,9 @@ yawn_in_progress = False  # Track if a yawn is currently in progress
 # Buffers for smoothing MAR
 mar_buffer = []
 buffer_size = 10  # Size of buffer to smooth MAR
+
+start_time = None  # Initialize variable for timing eye closure
+yawn_start_time = None  # Initialize variable for timing yawning
 
 while True:
     ret, frame = vs.read()
@@ -131,43 +154,69 @@ while True:
             cv2.drawContours(frame, [rightEyeHull], -1, (0, 255, 0), 1)
             cv2.drawContours(frame, [mouthHull], -1, (0, 0, 255), 1)
 
-            # Check if the eyes are closed
+            # Check for eye closure
             if ear < EYE_AR_THRESH:
+                if start_time is None:
+                    start_time = time.time()
                 COUNTER += 1
-                if COUNTER >= EYE_CLOSED_TIME_THRESH * 10:  # Assuming 10 frames per second
-                    if not eye_alert_spoken:
-                        alert_message = "Alert! You are drowsy."
-                        speak_alert(alert_message)
-                        score = max(score - penalty_eye_closure, 0)  # Apply penalty for drowsiness
-                        eye_alert_spoken = True
+                elapsed_time = time.time() - start_time
+
+                if elapsed_time >= EYE_CLOSED_TIME_THRESH and not eye_alert_spoken:
+                    alert_message = "Alert! Eyes closed for more than 4 seconds."
+                    cv2.putText(frame, alert_message, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                    speak_alert(alert_message)  # Trigger TTS alert
+                    eye_alert_spoken = True
+                    score = max(score - penalty_eye_closure, 0)  # Apply penalty for eye closure
+                    alert_message = "Are you feeling drowsy? Do you want to listen to some music?"
+                    speak_alert(alert_message)  # Trigger TTS alert for yawning
+                    # Assuming get_voice_command() is defined elsewhere
+                    command = get_voice_command()  # Get voice command from user
+                    if command:
+                        if "yes" in command:
+                            subprocess.call('Spotify.exe')
+                        elif "no" in command:
+                            print("User declined to listen to music.")
+                        else:
+                            print("Unrecognized command.")
             else:
                 COUNTER = 0
+                start_time = None
                 eye_alert_spoken = False
+                cv2.putText(frame, "EYES OPEN", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
 
             # Check for yawning
-            if smooth_mar > MOUTH_AR_THRESH:
+            if mar > MOUTH_AR_THRESH:
                 if not yawn_in_progress:
+                    yawn_start_time = time.time()  # Start timing the yawn
                     yawn_in_progress = True
-                    yawn_start_time = time.time()
+                else:
+                    yawn_duration = time.time() - yawn_start_time
 
-                # Check if yawn has been ongoing long enough
-                if yawn_in_progress and (time.time() - yawn_start_time > YAWN_TIME_THRESH):
-                    cv2.putText(frame, "YAWNING", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
-                    if not yawn_alert_spoken:
-                        alert_message = "Alert! You are yawning."
-                        speak_alert(alert_message)
-                        score = max(score - penalty_yawning, 0)  # Apply penalty for yawning
+                    # Only count the yawn if it lasts longer than the threshold
+                    if yawn_duration >= YAWN_TIME_THRESH and not yawn_alert_spoken:
+                        alert_message = "Alert! Yawning detected. Please stay alert."
+                        cv2.putText(frame, alert_message, (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255), 2)
+                        speak_alert(alert_message)  # Trigger TTS alert for yawning
                         yawn_alert_spoken = True
+                        score = max(score - penalty_yawning, 0)  # Apply penalty for yawning
             else:
                 yawn_in_progress = False
-                yawn_alert_spoken = False
-                last_score_update = time.time()
+                yawn_alert_spoken = False  # Reset yawn alert state
 
+    # Display the score
+    cv2.putText(frame, f"Score: {score}", (10, 90), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
+
+    # Check if enough time has passed to update the score in Firebase
+    current_time = time.time()
+    if current_time - last_score_update >= score_update_interval:
+      # Update the score in Firebase
+        last_score_update = current_time
+  
     cv2.imshow("Frame", frame)
-    if cv2.waitKey(1) & 0xFF == ord("q"):
+    key = cv2.waitKey(1)
+    if key == ord("q"):
         break
-    print(score)
-
-# Clean up
+print(score)
+# Cleanup
 vs.release()
 cv2.destroyAllWindows()
